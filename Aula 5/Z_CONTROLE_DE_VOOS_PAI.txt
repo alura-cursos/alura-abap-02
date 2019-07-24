@@ -1,0 +1,23 @@
+*&---------------------------------------------------------------------*
+*& Include          Z_CONTROLE_DE_VOOS_PAI
+*&---------------------------------------------------------------------*
+
+
+MODULE pai INPUT.
+
+  CASE sy-ucomm .
+
+    WHEN 'VOLTAR' OR 'CANCELAR' OR 'SAIR' .
+
+      LEAVE PROGRAM .
+
+    WHEN 'EXEC' .
+
+      SELECT *
+        FROM spfli
+        INTO TABLE it_spfli
+        WHERE carrid IN s_carrid .
+
+  ENDCASE.
+
+ENDMODULE.

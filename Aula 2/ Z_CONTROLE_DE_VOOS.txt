@@ -1,0 +1,13 @@
+*&---------------------------------------------------------------------*
+*& Module Pool      Z_CONTROLE_DE_VOOS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+PROGRAM z_controle_de_voos.
+
+DATA spfli  type spfli.
+
+SELECTION-SCREEN: BEGIN OF SCREEN 9999.
+SELECT-OPTIONS s_carrid for spfli-carrid.
+SELECTION-SCREEN: END OF SCREEN 9999.
+

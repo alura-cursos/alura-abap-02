@@ -1,0 +1,113 @@
+*&---------------------------------------------------------------------*
+*& Include          Z_CONTROLE_DE_VOOS_PERFORMS
+*&---------------------------------------------------------------------*
+
+
+FORM executa_selecao .
+
+  IF zspfli_atrasos-dia_do_voo IS INITIAL .
+
+    SELECT carrid, connid, countryfr,
+                  cityfrom, airpfrom, countryto,
+                    cityto, airpto, spfli~fltime, deptime,
+                      arrtime
+           FROM spfli
+           INTO TABLE @relatorio_atrasos
+           WHERE carrid IN @s_carrid
+             AND connid IN @s_connid
+             AND cityfrom IN @s_cityfr
+             AND cityto IN @s_cityto.
+
+  ELSE .
+
+    SELECT spfli~carrid, spfli~connid, spfli~countryfr,
+                     spfli~cityfrom, spfli~airpfrom, spfli~countryto,
+                       spfli~cityto, spfli~airpto, spfli~fltime, spfli~deptime,
+                         spfli~arrtime, zspfli_atrasos~dia_do_voo, zspfli_atrasos~atraso
+               FROM spfli AS spfli
+               INNER JOIN zspfli_atrasos AS zspfli_atrasos
+               ON spfli~carrid = zspfli_atrasos~carrid
+                 AND spfli~connid = zspfli_atrasos~connid
+               INTO TABLE @relatorio_atrasos
+                WHERE spfli~carrid IN @s_carrid
+                      AND spfli~connid IN @s_connid
+                      AND spfli~cityfrom IN @s_cityfr
+                      AND spfli~cityto IN @s_cityto
+                      AND zspfli_atrasos~dia_do_voo = @zspfli_atrasos-dia_do_voo.
+
+    IF sy-subrc = 0 .
+
+      DATA wa_relatorio_atrasos LIKE LINE OF relatorio_atrasos .
+
+      LOOP AT relatorio_atrasos INTO wa_relatorio_atrasos .
+
+        IF wa_relatorio_atrasos-atraso IS NOT INITIAL .
+
+          wa_relatorio_atrasos-arrtime = wa_relatorio_atrasos-arrtime + wa_relatorio_atrasos-atraso .
+          MODIFY relatorio_atrasos FROM  wa_relatorio_atrasos .
+
+        ENDIF .
+
+      ENDLOOP .
+    ENDIF .
+  ENDIF .
+
+ENDFORM .
+
+
+FORM insere_atraso_voo .
+
+  DATA: wa_spfli         LIKE LINE OF relatorio_atrasos,
+        wa_spfli_atrasos TYPE zspfli_atrasos.
+
+  LOOP AT relatorio_atrasos INTO wa_spfli .
+
+    wa_spfli_atrasos-carrid = wa_spfli-carrid .
+    wa_spfli_atrasos-connid = wa_spfli-connid .
+    wa_spfli_atrasos-dia_do_voo = zspfli_atrasos-dia_do_voo .
+    wa_spfli_atrasos-atraso = zspfli_atrasos-atraso .
+
+    INSERT zspfli_atrasos FROM wa_spfli_atrasos .
+
+    IF sy-subrc = 0 .
+      MESSAGE s000(zmsg_controle_de_voo) .  .
+    ELSE .
+      MESSAGE s001(zmsg_controle_de_voo) DISPLAY LIKE 'E'.
+    ENDIF .
+
+  ENDLOOP .
+
+ENDFORM.
+
+
+FORM controla_campos .
+
+  IF relatorio_atrasos IS NOT INITIAL .
+
+    LOOP AT SCREEN .
+
+      IF screen-group1 = 'GP1' .
+
+        screen-input = 1 .
+        MODIFY SCREEN .
+
+      ENDIF .
+
+    ENDLOOP .
+
+  ELSE .
+
+    LOOP AT SCREEN .
+
+      IF screen-group1 = 'GP1' .
+
+        screen-input = 0 .
+        MODIFY SCREEN .
+
+      ENDIF .
+
+    ENDLOOP .
+
+  ENDIF .
+
+ENDFORM .
