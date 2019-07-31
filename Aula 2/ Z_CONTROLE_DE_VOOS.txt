@@ -1,13 +1,21 @@
 *&---------------------------------------------------------------------*
-*& Module Pool      Z_CONTROLE_DE_VOOS
+*& Module Pool       Z_CONTROLE_DE_VOOS
+*&
 *&---------------------------------------------------------------------*
+*&
 *&
 *&---------------------------------------------------------------------*
 PROGRAM z_controle_de_voos.
 
-DATA spfli  type spfli.
+DATA spfli TYPE spfli .
 
-SELECTION-SCREEN: BEGIN OF SCREEN 9999.
-SELECT-OPTIONS s_carrid for spfli-carrid.
+SELECTION-SCREEN:  BEGIN OF SCREEN 9999 AS SUBSCREEN.
+SELECTION-SCREEN: BEGIN OF BLOCK blk1 WITH FRAME TITLE text-001  .
+
+SELECT-OPTIONS: s_carrid FOR spfli-carrid NO INTERVALS.
+SELECT-OPTIONS: s_connid FOR spfli-connid NO INTERVALS.
+SELECT-OPTIONS: s_cityfr FOR spfli-cityfrom NO INTERVALS.
+SELECT-OPTIONS: s_cityto FOR spfli-cityto NO INTERVALS.
+
+SELECTION-SCREEN: END   OF BLOCK blk1.
 SELECTION-SCREEN: END OF SCREEN 9999.
-
