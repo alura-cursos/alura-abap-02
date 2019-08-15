@@ -1,0 +1,13 @@
+*&---------------------------------------------------------------------*
+*& Include          Z_CONTROLE_DE_VOOS_DECLARACOES
+*&---------------------------------------------------------------------*
+
+TABLES zspfli_atrasos .
+
+DATA spfli TYPE spfli .
+
+DATA: custom_container TYPE REF TO cl_gui_custom_container,
+      alv              TYPE REF TO cl_gui_alv_grid,
+      fieldcat         TYPE lvc_t_fcat.
+
+DATA relatorio_atrasos TYPE STANDARD TABLE OF zspfli_atrasos_estrutura .

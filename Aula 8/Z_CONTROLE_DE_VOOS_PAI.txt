@@ -5,16 +5,19 @@
 MODULE pai INPUT.
 
   CASE sy-ucomm.
+
     WHEN 'VOLTAR' OR 'CANCELAR' OR 'SAIR'.
+
       LEAVE PROGRAM.
+
     WHEN 'EXEC'.
-      SELECT *
-        FROM spfli
-        INTO TABLE it_spfli
-        WHERE carrid IN s_carrid
-          AND connid IN s_connid
-          AND cityfrom IN s_cityfr
-          AND cityto IN s_cityto .
+
+      PERFORM executa_selecao .
+
+    WHEN 'BTN_ATRASO'.
+
+      PERFORM insere_atraso_voo .
+
   ENDCASE.
 
 ENDMODULE.

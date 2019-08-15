@@ -1,0 +1,53 @@
+*&---------------------------------------------------------------------*
+*& Include          Z_CONTROLE_DE_VOOS_PBO
+*&---------------------------------------------------------------------*
+
+
+MODULE pbo OUTPUT.
+
+  DATA coluna LIKE LINE OF fieldcat .
+
+  SET PF-STATUS '1000'.
+
+  IF custom_container IS NOT BOUND .
+
+    CREATE OBJECT custom_container
+      EXPORTING
+        container_name = 'CC_ALV'.
+
+    CREATE OBJECT alv
+      EXPORTING
+        i_parent = custom_container.
+
+    CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+      EXPORTING
+        i_structure_name = 'SPFLI'
+      CHANGING
+        ct_fieldcat      = fieldcat.
+
+    LOOP AT fieldcat INTO coluna .
+
+      IF coluna-fieldname = 'DISTANCE'
+        OR coluna-fieldname = 'DISTID'
+          OR coluna-fieldname = 'FLTYPE'
+            OR coluna-fieldname = 'PERIOD'.
+
+        coluna-no_out = 'X'.
+        MODIFY fieldcat FROM coluna .
+
+      ENDIF .
+
+    ENDLOOP .
+
+
+    CALL METHOD alv->set_table_for_first_display
+      CHANGING
+        it_outtab       = it_spfli    " Output Table
+        it_fieldcatalog = fieldcat.     " Field Catalog
+
+  ENDIF .
+
+  CALL METHOD alv->refresh_table_display( ) .
+
+
+ENDMODULE.
